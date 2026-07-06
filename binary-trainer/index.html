@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Trainer</title>
+<style>
+:root {
+  --bg:    #080a10;
+  --bg2:   #0d1018;
+  --card:  #10141e;
+  --border:#1c2235;
+  --on:    #00e5cc;
+  --glow:  #00ffcc;
+  --off:   #0c1320;
+  --acc:   #7ab7ff;
+  --good:  #4ade80;
+  --bad:   #f87171;
+  --warn:  #fbbf24;
+  --txt:   #dce8f5;
+  --dim:   #5a6880;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brand {
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: var(--on);
+  text-shadow: 0 0 18px var(--glow), 0 0 40px #00ffcc44;
+}
+
+#mode-nav { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  padding: 7px 18px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.nav-btn .sub { font-size: 10px; font-weight: 400; opacity: 0.6; }
+.nav-btn:hover { border-color: var(--acc); color: var(--txt); }
+.nav-btn.active { border-color: var(--acc); background: #7ab7ff12; color: var(--acc); }
+
+/* ── Layout ──────────────────────────────────────────── */
+#game-area {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ── Bit Row ─────────────────────────────────────────── */
+.bit-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  justify-content: center;
+  margin: 28px 0;
+  flex-wrap: wrap;
+}
+
+.bit-group { display: flex; gap: 8px; }
+
+.bit-sep {
+  font-size: 28px;
+  color: var(--border);
+  padding-top: 28px;
+  user-select: none;
+}
+
+.bit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.bit-top {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dim);
+  letter-spacing: 0.5px;
+  height: 16px;
+}
+
+.bit-btn {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  transition: box-shadow 0.12s, background 0.12s, transform 0.08s, color 0.12s;
+  user-select: none;
+  outline: none;
+}
+
+.bit-btn.on {
+  background: radial-gradient(circle at 36% 30%, #80ffea, #00c8a8);
+  box-shadow: 0 0 8px var(--on), 0 0 22px #00ffcc99, 0 0 50px #00ffcc33;
+  color: #002a1e;
+}
+.bit-btn.off {
+  background: radial-gradient(circle at 36% 30%, #18243a, #0c1520);
+  box-shadow: inset 0 3px 9px rgba(0,0,0,0.8), 0 0 0 1.5px #1c2a3a;
+  color: #253248;
+}
+
+.bit-btn.on:hover  { box-shadow: 0 0 14px var(--on), 0 0 36px #00ffccbb, 0 0 70px #00ffcc44; transform: scale(1.07); }
+.bit-btn.off:hover:not(.locked) { background: radial-gradient(circle at 36% 30%, #1e2e45, #121c2e); transform: scale(1.07); }
+.bit-btn:active:not(.locked) { transform: scale(0.88); }
+.bit-btn.locked { cursor: default; pointer-events: none; }
+
+.bit-bot {
+  font-size: 9px;
+  color: #2a3a50;
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Explore total ───────────────────────────────────── */
+.total-box { text-align: center; margin: 4px 0 28px; }
+
+.total-dec {
+  font-family: 'Courier New', monospace;
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--txt);
+  transition: color 0.15s;
+}
+
+.total-dec.maxed { color: var(--on); text-shadow: 0 0 30px var(--glow); }
+
+.total-row {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  margin-top: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+}
+.label-hex  { color: var(--acc); }
+.label-bin  { color: var(--dim); }
+.label-char { color: var(--warn); }
+
+/* ── Explore controls ────────────────────────────────── */
+.explore-ctrl {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.challenge-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.challenge-lbl { font-size: 13px; color: var(--dim); }
+.challenge-num {
+  font-family: 'Courier New', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--warn);
+  min-width: 48px;
+  text-align: center;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn {
+  padding: 11px 26px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.14s;
+  letter-spacing: 0.4px;
+}
+.btn-primary { background: var(--acc); color: #040810; }
+.btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--txt); }
+.btn-ghost:hover { border-color: var(--acc); color: var(--acc); }
+.btn-danger { background: var(--bad); color: #200505; }
+.btn-good   { background: var(--good); color: #041508; }
+.btn-sm { padding: 7px 16px; font-size: 13px; }
+.btn:active { transform: scale(0.96); }
+
+/* ── Difficulty grid ─────────────────────────────────── */
+.mode-intro { text-align: center; max-width: 640px; margin: 0 auto; }
+.mode-intro h2 { font-size: 32px; margin-bottom: 10px; }
+.mode-intro p  { color: var(--dim); margin-bottom: 36px; font-size: 16px; line-height: 1.6; }
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 0 0 28px;
+}
+
+.diff-card {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 16px;
+  cursor: pointer;
+  text-align: center;
+  background: var(--card);
+  transition: all 0.15s;
+}
+.diff-card:hover { border-color: var(--acc); background: #7ab7ff0c; transform: translateY(-3px); }
+.diff-card h3 { font-size: 18px; margin-bottom: 6px; }
+.diff-card .range {
+  font-family: 'Courier New', monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--acc);
+  margin: 12px 0;
+}
+.diff-card p { font-size: 12px; color: var(--dim); }
+.diff-card .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+.tag-easy   { background: #4ade8022; color: var(--good); border: 1px solid #4ade8055; }
+.tag-medium { background: #fbbf2422; color: var(--warn); border: 1px solid #fbbf2455; }
+.tag-hard   { background: #f8717122; color: var(--bad);  border: 1px solid #f8717155; }
+
+.hi-label { font-size: 13px; color: var(--dim); margin-top: 4px; }
+.hi-label span { color: var(--acc); font-family: 'Courier New', monospace; }
+
+/* ── Quiz chrome ─────────────────────────────────────── */
+.quiz-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.quiz-progress { font-size: 14px; color: var(--dim); }
+.quiz-score-lbl { font-family: 'Courier New', monospace; font-size: 22px; color: var(--acc); }
+.quiz-streak-lbl { font-size: 14px; color: var(--warn); min-width: 80px; text-align: right; }
+
+.timer-track {
+  width: 100%;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+.timer-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.08s linear, background 0.3s;
+  background: var(--acc);
+}
+.timer-fill.hot { background: var(--bad); }
+
+.q-prompt {
+  text-align: center;
+  font-size: 18px;
+  color: var(--dim);
+  margin-bottom: 16px;
+}
+.q-number {
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--txt);
+  margin-bottom: 28px;
+  letter-spacing: 2px;
+}
+.q-binary {
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  margin-bottom: 8px;
+}
+
+.answer-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.ans-input {
+  font-family: 'Courier New', monospace;
+  font-size: 32px;
+  font-weight: 900;
+  width: 150px;
+  text-align: center;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  color: var(--txt);
+  padding: 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.ans-input:focus { border-color: var(--acc); }
+.ans-input.correct { border-color: var(--good); color: var(--good); }
+.ans-input.wrong   { border-color: var(--bad);  color: var(--bad);  }
+
+.feedback-line {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  height: 44px;
+  margin-top: 16px;
+  font-family: 'Courier New', monospace;
+  transition: opacity 0.2s;
+}
+.feedback-line.ok  { color: var(--good); }
+.feedback-line.err { color: var(--bad);  }
+
+/* ── Write mode target ───────────────────────────────── */
+.write-target {
+  text-align: center;
+  margin-bottom: 4px;
+}
+.write-target-label { font-size: 16px; color: var(--dim); margin-bottom: 6px; }
+.write-target-num {
+  font-family: 'Courier New', monospace;
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--txt);
+}
+.write-progress-label { text-align: center; font-size: 13px; color: var(--dim); margin-top: 4px; font-family: 'Courier New', monospace; }
+
+/* ── Blitz ───────────────────────────────────────────── */
+.blitz-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.blitz-time {
+  font-family: 'Courier New', monospace;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--warn);
+  transition: color 0.3s;
+}
+.blitz-time.red { color: var(--bad); animation: pulse 0.6s infinite; }
+.blitz-score-disp { font-family: 'Courier New', monospace; font-size: 28px; color: var(--acc); }
+.blitz-combo { font-size: 18px; color: var(--warn); text-align: center; height: 28px; }
+.lives { display: flex; gap: 5px; font-size: 22px; }
+
+/* ── Results ─────────────────────────────────────────── */
+.results-wrap { text-align: center; }
+.results-grade { font-size: 80px; margin-bottom: 0px; }
+.results-pts {
+  font-family: 'Courier New', monospace;
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--acc);
+  line-height: 1;
+}
+.results-sub { font-size: 16px; color: var(--dim); margin-top: 6px; margin-bottom: 28px; }
+
+.results-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  text-align: left;
+  margin-bottom: 28px;
+}
+.results-tbl th { color: var(--dim); padding: 6px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+.results-tbl td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+.results-tbl tr.ok  td:nth-child(4) { color: var(--good); }
+.results-tbl tr.err td:nth-child(4) { color: var(--bad); }
+
+.results-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Blitz game-over ─────────────────────────────────── */
+.blitz-over { text-align: center; }
+.blitz-over h2 { font-size: 28px; margin-bottom: 8px; }
+.blitz-final { font-family: 'Courier New', monospace; font-size: 72px; font-weight: 900; color: var(--acc); }
+.blitz-new-hi { color: var(--warn); font-size: 20px; font-weight: 700; margin-top: 4px; animation: pulse 1s infinite; }
+.blitz-stats { color: var(--dim); font-size: 14px; margin: 12px 0 28px; }
+
+/* ── Explainer strip ─────────────────────────────────── */
+.explainer {
+  text-align: center;
+  font-size: 15px;
+  color: var(--dim);
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+.explainer strong { color: var(--txt); }
+
+/* ── Correct flash overlay ───────────────────────────── */
+.correct-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: #4ade8010;
+  animation: flashbg 0.5s ease forwards;
+  z-index: 9999;
+}
+@keyframes flashbg { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ── Animations ──────────────────────────────────────── */
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-9px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+@keyframes slidein {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-pop   { animation: pop   0.28s ease; }
+.anim-shake { animation: shake 0.38s ease; }
+.anim-in    { animation: slidein 0.25s ease; }
+
+/* ── Misc ─────────────────────────────────────────────── */
+.center { text-align: center; }
+.sep { margin: 0 4px; color: var(--border); }
+.full-w { width: 100%; }
+
+.blitz-type-badge {
+  display: inline-block;
+  padding: 3px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.badge-read  { background: #7ab7ff18; color: var(--acc); border: 1px solid #7ab7ff44; }
+.badge-write { background: #a78bfa18; color: #a78bfa;    border: 1px solid #a78bfa44; }
+
+.intro-big { font-size: 48px; margin-bottom: 12px; }
+
+/* ── Info strip ───────────────────────────────────────── */
+#info-strip {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+  max-height: 42px; /* collapsed */
+}
+#info-strip.open { max-height: 700px; }
+
+.info-toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 28px;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  color: var(--dim);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: color 0.15s;
+}
+.info-toggle:hover { color: var(--txt); }
+
+.info-toggle-label {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.info-toggle-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.info-toggle-pill .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--on);
+  box-shadow: 0 0 6px var(--glow);
+  flex-shrink: 0;
+}
+.info-chevron {
+  margin-left: auto;
+  font-size: 11px;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+#info-strip.open .info-chevron { transform: rotate(180deg); }
+
+.info-body {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 0 12px 20px;
+}
+
+.info-card {
+  padding: 18px 20px;
+  border-left: 1px solid var(--border);
+}
+.info-card:first-child { border-left: none; }
+
+.info-card-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+.info-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--acc);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+.info-card p {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--dim);
+}
+.info-card p strong { color: var(--txt); }
+.info-card .info-example {
+  margin-top: 10px;
+  padding: 7px 10px;
+  background: var(--card);
+  border-radius: 5px;
+  border-left: 2px solid var(--on);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--on);
+  line-height: 1.7;
+}
+.info-card .info-list {
+  margin-top: 8px;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.8;
+}
+.info-card .info-list li::before {
+  content: '→ ';
+  color: var(--on);
+  font-weight: 700;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">0 1  B I N A R Y</div>
+  <nav id="mode-nav"></nav>
+</header>
+
+<section id="info-strip">
+  <button class="info-toggle" onclick="document.getElementById('info-strip').classList.toggle('open')">
+    <div class="info-toggle-label">
+      <span class="info-toggle-pill"><span class="dot"></span>What is binary?</span>
+      <span class="info-toggle-pill"><span class="dot"></span>How computers read it</span>
+      <span class="info-toggle-pill"><span class="dot"></span>Where you see it every day</span>
+      <span class="info-toggle-pill"><span class="dot"></span>Hex &amp; the binary family</span>
+    </div>
+    <span class="info-chevron">▼</span>
+  </button>
+
+  <div class="info-body">
+
+    <div class="info-card">
+      <div class="info-card-icon">🔢</div>
+      <h4>WHAT IS BINARY?</h4>
+      <p>
+        Binary is <strong>base-2</strong> — a number system that uses only two digits: <strong>0</strong> and <strong>1</strong>.
+        Humans use base-10 (ten fingers, ten symbols: 0–9). Computers use base-2 because electronic
+        switches have exactly two states: <strong>on or off</strong>.
+      </p>
+      <p style="margin-top:8px">
+        Each digit is called a <strong>bit</strong> (binary digit). Every position is
+        double the one to its right — just like how each position in base-10 is 10× the last.
+      </p>
+      <div class="info-example">
+        Base-10:  hundreds · tens · ones<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;100 · 10 · 1<br>
+        <br>
+        Base-2:   ...· 8 · 4 · 2 · 1<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 2³· 2²· 2¹· 2⁰
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-icon">⚡</div>
+      <h4>HOW COMPUTERS READ IT</h4>
+      <p>
+        Every chip is built from <strong>transistors</strong> — microscopic switches etched onto silicon.
+        A transistor is either conducting electricity (<strong>1</strong>) or blocking it (<strong>0</strong>).
+        Your CPU has billions of them.
+      </p>
+      <p style="margin-top:8px">
+        8 bits = <strong>1 byte</strong> — the basic unit of computer memory.
+        One byte can represent 2⁸ = <strong>256 different values</strong> (0–255).
+        Everything from text to images to machine code is bytes at rest.
+      </p>
+      <div class="info-example">
+        1 bit  → 2 values  (0 or 1)<br>
+        4 bits → 16 values (0–15)<br>
+        8 bits → 256 values (0–255)<br>
+        32 bits → 4 billion values<br>
+        64 bits → 18 quintillion values
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-icon">🌍</div>
+      <h4>WHERE YOU SEE IT</h4>
+      <p>Binary is the substrate of everything digital — you interact with it constantly without seeing the 0s and 1s.</p>
+      <ul class="info-list">
+        <li><strong>Text:</strong> 'A' = 65 = 01000001. Every character is a number (ASCII / Unicode).</li>
+        <li><strong>Colors:</strong> #FF5733 = red 255, green 87, blue 51 — three 8-bit numbers.</li>
+        <li><strong>Networking:</strong> IP 192.168.1.1 is four 8-bit numbers. Subnet masks are binary AND operations.</li>
+        <li><strong>Files:</strong> 1 KB = 1024 bytes = 2¹⁰. KB → MB → GB are all powers of 2.</li>
+        <li><strong>Audio:</strong> CD quality = 16-bit samples at 44,100 per second per channel.</li>
+        <li><strong>Permissions:</strong> Unix chmod 755 = rwxr-xr-x = 111 101 101 in binary.</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-icon">🔡</div>
+      <h4>HEX &amp; THE BINARY FAMILY</h4>
+      <p>
+        Binary gets long fast — 255 takes 8 digits. So engineers use <strong>hexadecimal (base-16)</strong>
+        as a compact shorthand. One hex digit represents exactly <strong>4 bits</strong>.
+      </p>
+      <div class="info-example">
+        1111 1111₂ = FF₁₆ = 255₁₀<br>
+        0001 0000₂ = 10₁₆ = 16₁₀<br>
+        1010 1011₂ = AB₁₆ = 171₁₀
+      </div>
+      <p style="margin-top:10px">You'll see hex in:</p>
+      <ul class="info-list">
+        <li>CSS colors: <strong>#1A2B3C</strong></li>
+        <li>Memory addresses: <strong>0x7fff5fbff8c0</strong></li>
+        <li>SHA hashes: <strong>deadbeef...</strong></li>
+        <li>MAC addresses: <strong>00:1A:2B:3C:4D:5E</strong></li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<main id="game-area"></main>
+
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database Systems Trainer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">DB</span>
+      <h1>Database Systems Trainer</h1>
+    </div>
+    <div class="topbar-right">
+      <span id="overall-progress" class="progress-pill"></span>
+      <button id="reset-btn" class="ghost-btn" title="Reset all progress">Reset progress</button>
+    </div>
+  </header>
+
+  <nav id="level-nav" class="level-nav"></nav>
+
+  <main class="layout">
+    <article class="content">
+      <header class="level-header">
+        <span id="level-number" class="level-number"></span>
+        <h2 id="level-title"></h2>
+        <p id="level-why" class="why-it-matters"></p>
+      </header>
+
+      <section class="lesson card">
+        <h3>Learn</h3>
+        <div id="learn-content"></div>
+      </section>
+
+      <section class="play card">
+        <h3>Play <span class="hint-text">- click around, no goal here</span></h3>
+        <div id="play-content"></div>
+      </section>
+
+      <section class="try card">
+        <h3>Try</h3>
+        <div id="try-content"></div>
+      </section>
+
+      <footer class="level-footer">
+        <button id="prev-btn" class="ghost-btn">Previous</button>
+        <button id="next-btn" class="primary-btn">Next</button>
+      </footer>
+    </article>
+
+    <aside class="sidebar">
+      <section class="card">
+        <h3>Glossary</h3>
+        <div id="glossary"></div>
+      </section>
+      <section class="card">
+        <h3>Notes</h3>
+        <textarea id="notes" placeholder="Your own notes for this level - saved automatically."></textarea>
+      </section>
+    </aside>
+  </main>
+
+  <script src="js/lib/db.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/glossary.js"></script>
+  <script src="js/hints.js"></script>
+
+  <script src="js/levels/00-orientation.js"></script>
+  <script src="js/levels/01-tables-schemas.js"></script>
+  <script src="js/levels/02-select-filter.js"></script>
+  <script src="js/levels/03-joins.js"></script>
+  <script src="js/levels/04-indexes.js"></script>
+  <script src="js/levels/05-query-planning.js"></script>
+  <script src="js/levels/06-transactions.js"></script>
+  <script src="js/levels/07-isolation.js"></script>
+  <script src="js/levels/08-locks-mvcc.js"></script>
+  <script src="js/levels/09-normalization.js"></script>
+  <script src="js/levels/10-aggregation-windows.js"></script>
+  <script src="js/levels/11-storage-wal.js"></script>
+  <script src="js/levels/12-replication-backups.js"></script>
+  <script src="js/levels/13-performance-tuning.js"></script>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

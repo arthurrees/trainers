@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embedded Systems & Electronics Trainer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">&#9889;</span>
+      <h1>Embedded Systems &amp; Electronics Trainer</h1>
+    </div>
+    <div class="topbar-right">
+      <span id="overall-progress" class="progress-pill"></span>
+      <button id="reset-btn" class="ghost-btn" title="Reset all progress">Reset progress</button>
+    </div>
+  </header>
+
+  <nav id="level-nav" class="level-nav"></nav>
+
+  <main class="layout">
+    <article class="content">
+      <header class="level-header">
+        <span id="level-number" class="level-number"></span>
+        <h2 id="level-title"></h2>
+        <p id="level-why" class="why-it-matters"></p>
+      </header>
+
+      <section class="lesson card">
+        <h3>Learn</h3>
+        <div id="learn-content"></div>
+      </section>
+
+      <section class="play card">
+        <h3>Play <span class="hint-text">&mdash; click around, no goal here</span></h3>
+        <div id="play-content"></div>
+      </section>
+
+      <section class="try card">
+        <h3>Try</h3>
+        <div id="try-content"></div>
+      </section>
+
+      <footer class="level-footer">
+        <button id="prev-btn" class="ghost-btn">&larr; Previous</button>
+        <button id="next-btn" class="primary-btn">Next &rarr;</button>
+      </footer>
+    </article>
+
+    <aside class="sidebar">
+      <section class="card">
+        <h3>Glossary</h3>
+        <div id="glossary"></div>
+      </section>
+      <section class="card">
+        <h3>Notes</h3>
+        <textarea id="notes" placeholder="Your own notes for this level — saved automatically."></textarea>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Libraries -->
+  <script src="js/lib/canvas-utils.js"></script>
+  <script src="js/lib/embed.js"></script>
+
+  <!-- Core -->
+  <script src="js/storage.js"></script>
+  <script src="js/glossary.js"></script>
+  <script src="js/hints.js"></script>
+
+  <!-- Levels -->
+  <script src="js/levels/00-orientation.js"></script>
+  <script src="js/levels/01-electricity.js"></script>
+  <script src="js/levels/02-circuits.js"></script>
+  <script src="js/levels/03-gpio.js"></script>
+  <script src="js/levels/04-analog.js"></script>
+  <script src="js/levels/05-sensors.js"></script>
+  <script src="js/levels/06-actuators.js"></script>
+  <script src="js/levels/07-protocols.js"></script>
+  <script src="js/levels/08-esp32.js"></script>
+  <script src="js/levels/09-raspberry-pi.js"></script>
+  <script src="js/levels/10-wireless.js"></script>
+  <script src="js/levels/11-power.js"></script>
+  <script src="js/levels/12-breadboard-pcb.js"></script>
+  <script src="js/levels/13-projects.js"></script>
+
+  <!-- App boot last -->
+  <script src="js/main.js"></script>
+</body>
+</html>
