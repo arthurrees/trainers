@@ -1,6 +1,6 @@
-// Level 7 — Counting & Combinatorics
+// Level 8 — Counting & Combinatorics
 DMT.registerLevel({
-  id: 7,
+  id: 8,
   title: 'Counting & Combinatorics',
   whyItMatters: 'How many possible passwords? How many distinct license plates? How many ways can a sort algorithm split a list? Counting answers all of these — and combinatorics is the toolkit. CS uses it constantly: hash table sizing, complexity analysis, probability, cryptography.',
   glossary: ['n!', 'P(n,k)', 'C(n,k)', '(n choose k)'],
@@ -157,7 +157,7 @@ DMT.registerLevel({
     },
     {
       difficulty: 'hard',
-      prompt: 'A class of 10 students. How many ways to choose a committee of 3 (members are unordered, no roles)?',
+      prompt: 'From 10 students, choose a president and vice president, then choose a 3-person committee from the remaining 8 students. How many outcomes are possible?',
       mountInput: function (c) {
         var input = document.createElement('input');
         input.type = 'number';
@@ -166,14 +166,15 @@ DMT.registerLevel({
         return function () { return parseInt(input.value, 10); };
       },
       check: function (v) {
-        if (v === 120) return { correct: true, feedback: 'C(10,3) = 10!/(3!·7!) = (10·9·8)/(3·2·1) = 720/6 = 120.' };
-        if (v === 720) return { correct: false, feedback: 'You used permutations (P(10,3)=720). But committees don\'t care about order — divide by 3! to remove the over-counting.' };
-        return { correct: false, feedback: 'C(10,3) = 10·9·8 / (3·2·1) = 120. Order doesn\'t matter, so use combinations.' };
+        if (v === 5040) return { correct: true, feedback: 'Choose the ordered officers in P(10,2)=10·9=90 ways. Then choose 3 of the remaining 8 in C(8,3)=56 ways. Multiply: 90·56=5,040.' };
+        if (v === 120) return { correct: false, feedback: 'That counts only a 3-person committee from 10. The two distinct officer roles must be chosen first.' };
+        if (v === 30240) return { correct: false, feedback: 'That treats the committee positions as ordered. The committee has no roles, so use C(8,3), not P(8,3).' };
+        return { correct: false, feedback: 'Officers: P(10,2)=90. Committee from the remaining 8: C(8,3)=56. Multiply to get 5,040.' };
       },
       hints: [
-        'Does order matter for a committee? (No — same 3 people = same committee.)',
-        'Use combinations: C(10, 3).',
-        'C(10,3) = (10·9·8) / (3·2·1) = 120.'
+        'Split the task: choose two ordered officer roles, then an unordered committee.',
+        'Officers: P(10,2)=90. After that, 8 students remain; committee: C(8,3)=56.',
+        'Multiply the stages: 90 × 56 = 5,040.'
       ]
     }
   ]

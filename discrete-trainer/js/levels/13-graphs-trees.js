@@ -1,7 +1,7 @@
-// Level 9 — Graphs
+// Level 13 — Bonus: Graphs and Trees
 DMT.registerLevel({
-  id: 9,
-  title: 'Graphs',
+  id: 13,
+  title: 'Bonus: Graphs & Trees',
   whyItMatters: 'A graph = nodes connected by edges. It is the data structure for: social networks, road maps, the web, file systems, dependencies, neural nets. Half of every algorithms class is graph algorithms.',
   glossary: ['V', 'E', 'deg(v)', 'BFS', 'DFS'],
   learn: ''
@@ -9,7 +9,7 @@ DMT.registerLevel({
     + '<ul>'
     +   '<li>A <strong>graph</strong> G = (V, E) is a set V of <strong>vertices</strong> (nodes) and a set E of <strong>edges</strong> (connections between pairs of vertices).</li>'
     +   '<li>The <strong>degree</strong> of a vertex v, written <code class="inline">deg(v)</code>, is the number of edges touching it.</li>'
-    +   '<li>A <strong>path</strong> is a sequence of distinct vertices each connected by an edge. A <strong>cycle</strong> is a path that returns to its start.</li>'
+    +   '<li>A <strong>walk</strong> follows adjacent vertices and may repeat them. A <strong>path</strong> is a walk with no repeated vertices. A <strong>cycle</strong> starts and ends at the same vertex, with no other repeated vertices.</li>'
     +   '<li>A graph is <strong>connected</strong> if you can get from any vertex to any other along edges.</li>'
     + '</ul>'
 
@@ -28,19 +28,20 @@ DMT.registerLevel({
     +   '<li><strong>Bipartite</strong>: vertices split into two groups, every edge crosses between groups. Equivalent: 2-colourable. Equivalent: no odd cycle.</li>'
     +   '<li><strong>Tree</strong>: connected and has no cycles. Always has exactly |V| − 1 edges.</li>'
     +   '<li><strong>Complete graph K<sub>n</sub></strong>: every pair of vertices is connected. C(n,2) edges.</li>'
-    +   '<li><strong>Eulerian</strong>: a graph where you can walk every edge exactly once and return to start. Possible iff connected and every vertex has even degree.</li>'
+    +   '<li><strong>Eulerian</strong>: a nonempty graph where you can walk every edge exactly once and return to the start. In this trainer, that means the whole graph is connected and every vertex has even degree.</li>'
     + '</ul>',
 
   mountPlay: function (container) {
     container.innerHTML = ''
       + '<p class="muted">Click empty space to add a node. Click two nodes in succession to add or remove an edge between them. Right-click a node to delete it.</p>'
-      + '<div class="canvas-host"><canvas id="g-canvas" width="640" height="360"></canvas></div>'
+      + '<div class="canvas-host"><canvas id="g-canvas" width="640" height="360" tabindex="0" role="img" aria-label="Interactive undirected graph editor. Tap empty space to add a node and tap two nodes to toggle an edge."></canvas></div>'
       + '<div class="controls-row" style="margin-top:10px">'
       +   '<button class="secondary-btn" id="g-clear">Clear</button>'
+      +   '<button class="secondary-btn" id="g-delete">Delete selected node</button>'
       +   '<button class="secondary-btn" id="g-bfs">Run BFS from selected</button>'
       +   '<button class="secondary-btn" id="g-dfs">Run DFS from selected</button>'
       + '</div>'
-      + '<div id="g-info" style="margin-top:10px"></div>';
+      + '<div id="g-info" style="margin-top:10px" aria-live="polite"></div>';
 
     var canvas = container.querySelector('#g-canvas');
     var info = container.querySelector('#g-info');
@@ -53,7 +54,6 @@ DMT.registerLevel({
       return DMT.lib.canvas.hitNode(g, x, y);
     }
     function render() {
-      window._dmtPlayGraph = g;
       DMT.lib.graph.draw(g, canvas, { selected: selected, highlight: highlight });
       var degrees = g.nodes.map(function (n) { return DMT.lib.graph.degree(g, n.id); });
       var info_html = '';
@@ -109,6 +109,11 @@ DMT.registerLevel({
     container.querySelector('#g-clear').addEventListener('click', function () {
       g = DMT.lib.graph.create();
       selected = null; pendingEdgeFrom = null; clearHighlight(); render();
+    });
+    container.querySelector('#g-delete').addEventListener('click', function () {
+      if (selected === null) { alert('Select a node first.'); return; }
+      DMT.lib.graph.removeNode(g, selected);
+      pendingEdgeFrom = null; selected = null; clearHighlight(); render();
     });
     container.querySelector('#g-bfs').addEventListener('click', function () {
       if (selected === null) { alert('Click a node first to select it as the BFS start.'); return; }
@@ -192,27 +197,34 @@ DMT.registerLevel({
     },
     {
       difficulty: 'hard',
-      prompt: 'Use the playground above to <strong>build a graph that is Eulerian</strong>: connected, with every vertex having even degree, and at least 4 vertices and 4 edges. Then click "Check answer" — it reads the current graph from the canvas.',
+      prompt: 'Build an Eulerian graph on vertices A, B, C, D by selecting edges. Your answer must be connected and every vertex must have even degree.',
       mountInput: function (c) {
-        c.innerHTML = '<div class="muted" style="font-size:13px">(uses the graph in the play area above — build one, then click Check)</div>';
-        return function () { return window._dmtPlayGraph || null; };
+        var edges = ['AB', 'AC', 'AD', 'BC', 'BD', 'CD'];
+        var div = document.createElement('div'); div.className = 'checkbox-list';
+        var boxes = edges.map(function (edge) {
+          var label = document.createElement('label');
+          var box = document.createElement('input'); box.type = 'checkbox';
+          label.appendChild(box); label.appendChild(document.createTextNode(' edge ' + edge)); div.appendChild(label);
+          return { edge: edge, box: box };
+        });
+        c.appendChild(div);
+        return function () { return boxes.filter(function (x) { return x.box.checked; }).map(function (x) { return x.edge; }); };
       },
       check: function (v) {
-        var g = v;
-        if (!g) return { correct: false, feedback: 'Build a graph in the playground above first.' };
-        if (g.nodes.length < 4) return { correct: false, feedback: 'Need at least 4 vertices. Currently: ' + g.nodes.length + '.' };
-        if (g.edges.length < 4) return { correct: false, feedback: 'Need at least 4 edges. Currently: ' + g.edges.length + '.' };
-        if (!DMT.lib.graph.isConnected(g)) return { correct: false, feedback: 'Graph is not connected — every node must be reachable from every other.' };
+        var g = DMT.lib.graph.create();
+        ['A', 'B', 'C', 'D'].forEach(function (label) { DMT.lib.graph.addNode(g, 0, 0, label); });
+        var ids = { A: 0, B: 1, C: 2, D: 3 };
+        v.forEach(function (edge) { DMT.lib.graph.addEdge(g, ids[edge[0]], ids[edge[1]]); });
+        if (!DMT.lib.graph.isConnected(g)) return { correct: false, feedback: 'Not connected yet—every vertex must be reachable from every other.' };
         var bad = g.nodes.filter(function (n) { return DMT.lib.graph.degree(g, n.id) % 2 !== 0; });
-        if (bad.length > 0) return { correct: false, feedback: 'These nodes have odd degree: ' + bad.map(function (n) { return n.label; }).join(', ') + '. Add or remove edges to make them even.' };
+        if (bad.length > 0) return { correct: false, feedback: 'These vertices have odd degree: ' + bad.map(function (n) { return n.label; }).join(', ') + '.' };
         return { correct: true, feedback: 'Connected + every vertex even degree → Eulerian. You could traverse every edge exactly once and end where you started.' };
       },
       hints: [
-        'A simple Eulerian graph: a 4-cycle (4 nodes in a square, 4 edges). Every vertex has degree 2.',
-        'Or 3 nodes in a triangle plus a 4th connected by 2 edges to two of them — but watch the degrees.',
-        'Easiest answer: 4 nodes forming a square (cycle). Each vertex has degree 2 — even and connected.'
+        'A simple cycle is Eulerian because every vertex has degree 2.',
+        'Make a 4-cycle A–B–C–D–A.',
+        'Select AB, BC, CD, and AD.'
       ]
     }
   ]
 });
-

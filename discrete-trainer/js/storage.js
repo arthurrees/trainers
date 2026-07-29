@@ -2,7 +2,7 @@
 window.DMT = window.DMT || {};
 
 DMT.storage = (function () {
-  var KEY = 'dmt_state_v1';
+  var KEY = 'dmt_state_v2';
 
   function load() {
     try {

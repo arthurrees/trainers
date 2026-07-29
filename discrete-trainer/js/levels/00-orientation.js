@@ -140,7 +140,7 @@ DMT.registerLevel({
           'Some natural number is at least 0.',
           'Every natural number is greater than or equal to 0.',
           'There exists a natural number x where x is bigger than 0.',
-          'No natural number can be less than 0.'
+          'Every natural number is less than 0.'
         ];
         var sel = document.createElement('select');
         sel.innerHTML = '<option value="-1">— pick one —</option>' + opts.map(function (o, i) {
@@ -151,7 +151,6 @@ DMT.registerLevel({
       },
       check: function (v) {
         if (v === 1) return { correct: true, feedback: '∀ = "for all", ∈ ℕ = "in the natural numbers", ≥ = "greater than or equal to". So: every natural number is ≥ 0.' };
-        if (v === 3) return { correct: false, feedback: 'Close in meaning, but the literal translation should follow the symbols. ∀ is "for every / for all", not "no … is".' };
         return { correct: false, feedback: 'Read symbols left-to-right: ∀ = "for all", x ∈ ℕ = "x in the naturals", " : " = "such that", x ≥ 0 = "x is at least 0".' };
       },
       hints: [

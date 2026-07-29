@@ -6,7 +6,8 @@
   levels.sort(function (a, b) { return a.id - b.id; });
 
   var state = DMT.storage.load();
-  var current = Math.min(state.currentLevel || 0, levels.length - 1);
+  var savedLevel = (typeof state.currentLevel === 'number' && isFinite(state.currentLevel) && Math.floor(state.currentLevel) === state.currentLevel) ? state.currentLevel : 0;
+  var current = Math.max(0, Math.min(savedLevel, levels.length - 1));
 
   // ---- DOM refs ----
   var levelNav = document.getElementById('level-nav');
@@ -29,7 +30,7 @@
     levels.forEach(function (lvl, i) {
       var b = document.createElement('button');
       b.textContent = lvl.id + '. ' + lvl.title;
-      if (i === current) b.classList.add('active');
+      if (i === current) { b.classList.add('active'); b.setAttribute('aria-current', 'page'); }
       if (DMT.storage.levelCompleted(lvl.id, lvl.puzzles.length)) b.classList.add('completed');
       b.addEventListener('click', function () { goTo(i); });
       levelNav.appendChild(b);
@@ -94,6 +95,7 @@
   function renderPuzzle(lvl, puzzle, idx, container) {
     var box = document.createElement('div');
     box.className = 'puzzle';
+    box.setAttribute('role', 'group');
 
     var solved = DMT.storage.isSolved(lvl.id, idx);
 
@@ -107,8 +109,10 @@
 
     var prompt = document.createElement('div');
     prompt.className = 'puzzle-prompt';
+    prompt.id = 'puzzle-prompt-' + lvl.id + '-' + idx;
     prompt.innerHTML = puzzle.prompt;
     box.appendChild(prompt);
+    box.setAttribute('aria-labelledby', prompt.id);
 
     var inputHost = document.createElement('div');
     inputHost.className = 'puzzle-input';
@@ -137,6 +141,8 @@
 
     var feedback = document.createElement('div');
     feedback.className = 'puzzle-feedback';
+    feedback.setAttribute('role', 'status');
+    feedback.setAttribute('aria-live', 'polite');
     box.appendChild(feedback);
 
     checkBtn.addEventListener('click', function () {

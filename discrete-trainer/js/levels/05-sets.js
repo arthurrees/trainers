@@ -1,6 +1,6 @@
-// Level 4 — Sets & Venn diagrams
+// Level 5 — Sets & Venn diagrams
 DMT.registerLevel({
-  id: 4,
+  id: 5,
   title: 'Sets & Venn Diagrams',
   whyItMatters: 'A set is a collection with no duplicates and no order — exactly what a database, a deduplicated list, or a tag system already is. Set operations show up daily: filtering, joining, deduplicating, intersecting permissions.',
   glossary: ['∈', '∉', '⊆', '∪', '∩', '\\', '△', '∅', '|A|'],
@@ -180,9 +180,13 @@ DMT.registerLevel({
         return function () { return input.value; };
       },
       check: function (v) {
+        if (!/^\s*\d+\s*(,\s*\d+\s*)*$/.test(v)) {
+          return { correct: false, feedback: 'Use only a comma-separated list of integers, such as 3, 4, 5.' };
+        }
         var got = v.split(',').map(function (s) { return parseInt(s.trim(), 10); }).filter(function (n) { return !isNaN(n); });
         var expected = [3, 4, 5, 6, 8];
-        var ok = got.length === expected.length && expected.every(function (x) { return got.indexOf(x) !== -1; });
+        var unique = got.filter(function (x, i) { return got.indexOf(x) === i; });
+        var ok = got.length === unique.length && got.length === expected.length && expected.every(function (x) { return got.indexOf(x) !== -1; });
         if (ok) return { correct: true, feedback: 'A ∪ B = {1,2,3,4,5,6,8}. Removing C = {1,2} leaves {3, 4, 5, 6, 8}.' };
         return { correct: false, feedback: 'First do A ∪ B = {1,2,3,4,5,6,8}. Then remove the elements of C = {1,2}. Answer: {3, 4, 5, 6, 8}.' };
       },

@@ -78,7 +78,7 @@ DMT.registerLevel({
       +         '<option value="redCircle">x is a red circle</option>'
       +       '</select>'
       +     '</div>'
-      +     '<div id="qresult" class="formula-box"></div>'
+      +     '<div id="qresult" class="formula-box" aria-live="polite"></div>'
       +   '</div>'
       + '</div>';
 
@@ -117,6 +117,9 @@ DMT.registerLevel({
         var sat = predCheck(o, pred.value);
         var cell = document.createElement('div');
         cell.className = 'world-cell' + (sat ? ' satisfies' : '');
+        cell.tabIndex = 0;
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('aria-label', 'Object x' + (i + 1) + ': ' + o.color + ' ' + o.shape + '. Activate to change color.');
         cell.innerHTML = '<div class="shape">' + emoji(o) + '</div>'
           + '<div class="muted" style="font-size:11px">x' + (i + 1) + '</div>'
           + '<div style="font-size:11px;margin-top:4px">' + (sat ? '<span class="tag yes">satisfies</span>' : '<span class="tag no">no</span>') + '</div>';
@@ -130,6 +133,9 @@ DMT.registerLevel({
           e.preventDefault();
           o.shape = o.shape === 'circle' ? 'square' : 'circle';
           render();
+        });
+        cell.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cell.click(); }
         });
         grid.appendChild(cell);
       });
@@ -147,7 +153,14 @@ DMT.registerLevel({
     pred.addEventListener('change', render);
 
     var shapeRow = container.querySelector('#shape-row');
-    shapeRow.innerHTML = '<span class="muted" style="font-size:12px">Right-click a cell to toggle its shape (○/□).</span>';
+    shapeRow.innerHTML = '<span class="muted" style="font-size:12px">Toggle shape:</span>';
+    world.forEach(function (o, i) {
+      var b = document.createElement('button');
+      b.className = 'secondary-btn';
+      b.textContent = 'x' + (i + 1) + ' ○/□';
+      b.addEventListener('click', function () { o.shape = o.shape === 'circle' ? 'square' : 'circle'; render(); });
+      shapeRow.appendChild(b);
+    });
 
     render();
   },

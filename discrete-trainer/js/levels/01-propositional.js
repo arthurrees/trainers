@@ -156,7 +156,9 @@ DMT.registerLevel({
         function update() {
           if (!input.value.trim()) { live.innerHTML = '<span class="muted">target: F F F T</span>'; return; }
           try {
-            var col = DMT.lib.expr.valueColumn(DMT.lib.expr.parse(input.value), ['p', 'q']);
+            var ast = DMT.lib.expr.parse(input.value);
+            if (!DMT.lib.expr.usesOnlyVars(ast, ['p', 'q'])) { live.innerHTML = '<span style="color:var(--bad)">Use only p and q.</span>'; return; }
+            var col = DMT.lib.expr.valueColumn(ast, ['p', 'q']);
             var match = col === 'FFFT';
             live.innerHTML = '<span class="muted">your column:</span> <span style="color:' + (match ? 'var(--good)' : 'var(--accent)') + '">' + col.split('').join(' ') + '</span> &nbsp; <span class="muted">target:</span> <span style="color:var(--good)">F F F T</span>';
           } catch (e) {
@@ -171,7 +173,9 @@ DMT.registerLevel({
       },
       check: function (v) {
         try {
-          var col = DMT.lib.expr.valueColumn(DMT.lib.expr.parse(v), ['p', 'q']);
+          var ast = DMT.lib.expr.parse(v);
+          if (!DMT.lib.expr.usesOnlyVars(ast, ['p', 'q'])) return { correct: false, feedback: 'Use only the variables p and q.' };
+          var col = DMT.lib.expr.valueColumn(ast, ['p', 'q']);
           if (col === 'FFFT') return { correct: true, feedback: 'That is the AND truth table — true only when both are true.' };
           return { correct: false, feedback: 'Your column was ' + col.split('').join(' ') + '; target is F F F T.' };
         } catch (e) { return { correct: false, feedback: 'Could not parse: ' + e.message }; }
@@ -196,7 +200,9 @@ DMT.registerLevel({
         function update() {
           if (!input.value.trim()) { live.innerHTML = '<span class="muted">target: T T F T</span>'; return; }
           try {
-            var col = DMT.lib.expr.valueColumn(DMT.lib.expr.parse(input.value), ['p', 'q']);
+            var ast = DMT.lib.expr.parse(input.value);
+            if (!DMT.lib.expr.usesOnlyVars(ast, ['p', 'q'])) { live.innerHTML = '<span style="color:var(--bad)">Use only p and q.</span>'; return; }
+            var col = DMT.lib.expr.valueColumn(ast, ['p', 'q']);
             var match = col === 'TTFT';
             live.innerHTML = '<span class="muted">your column:</span> <span style="color:' + (match ? 'var(--good)' : 'var(--accent)') + '">' + col.split('').join(' ') + '</span> &nbsp; <span class="muted">target:</span> <span style="color:var(--good)">T T F T</span>';
           } catch (e) {
@@ -211,7 +217,9 @@ DMT.registerLevel({
       },
       check: function (v) {
         try {
-          var col = DMT.lib.expr.valueColumn(DMT.lib.expr.parse(v), ['p', 'q']);
+          var ast = DMT.lib.expr.parse(v);
+          if (!DMT.lib.expr.usesOnlyVars(ast, ['p', 'q'])) return { correct: false, feedback: 'Use only the variables p and q.' };
+          var col = DMT.lib.expr.valueColumn(ast, ['p', 'q']);
           if (col === 'TTFT') return { correct: true, feedback: 'That is the IMPLIES truth table. Only false when p is true and q is false.' };
           return { correct: false, feedback: 'Your column was ' + col.split('').join(' ') + '; target T T F T.' };
         } catch (e) { return { correct: false, feedback: 'Could not parse: ' + e.message }; }

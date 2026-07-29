@@ -1,23 +1,11 @@
-// Level 10 — Trees & Boolean Algebra
+// Level 14 — Bonus: Boolean Algebra
 DMT.registerLevel({
-  id: 10,
-  title: 'Trees & Boolean Algebra',
-  whyItMatters: 'Trees are the cleanest graphs — file systems, syntax trees, decision trees, search indexes. Boolean algebra is the math of digital circuits and every if-statement; the same simplification rules let you minimize hardware gates and tighten up code.',
+  id: 14,
+  title: 'Bonus: Boolean Algebra',
+  whyItMatters: 'Boolean algebra is the math of digital circuits and every if-statement. The same equivalence rules can minimize hardware gates and expose redundant conditions in code.',
   glossary: ['∧', '∨', '¬', '⊕', 'T', 'F'],
   learn: ''
-    + '<h4>Trees</h4>'
-    + '<p>A <strong>tree</strong> is a graph that is connected and has no cycles. Properties:</p>'
-    + '<ul>'
-    +   '<li>A tree on n vertices has exactly n − 1 edges.</li>'
-    +   '<li>There is exactly one path between any two vertices.</li>'
-    +   '<li>Adding any edge creates a cycle. Removing any edge disconnects it.</li>'
-    +   '<li>A <strong>leaf</strong> is a vertex of degree 1. Every tree with ≥ 2 vertices has ≥ 2 leaves.</li>'
-    + '</ul>'
-    + '<div class="callout"><div class="label">Where trees show up</div>'
-    + 'File systems, AST (abstract syntax trees), HTML DOM, BSTs, heaps, decision trees, B-trees, tries, segment trees. The whole vocabulary of "parent / child / root / leaf" comes from tree theory.'
-    + '</div>'
-
-    + '<h4>Boolean algebra</h4>'
+    + '<h4>Logic as algebra</h4>'
     + '<p>Boolean algebra is propositional logic seen as <em>algebra</em>. Same operators (∧, ∨, ¬), same equivalences from Level 2, but now you treat them like + and × in arithmetic — apply rules to simplify expressions.</p>'
 
     + '<table class="truth-table"><thead><tr><th>Law</th><th>Form</th></tr></thead><tbody>'
@@ -30,32 +18,15 @@ DMT.registerLevel({
     + '<tr><td><strong>Absorption</strong></td><td>p ∧ (p ∨ q) = p, &nbsp; p ∨ (p ∧ q) = p</td></tr>'
     + '</tbody></table>'
 
-    + '<div class="example"><div class="label">Worked simplification</div>'
-    + '(p ∧ q) ∨ (p ∧ ¬q)<br>'
-    + '= p ∧ (q ∨ ¬q) &nbsp; <span class="muted">(distributive law in reverse)</span><br>'
-    + '= p ∧ T &nbsp; <span class="muted">(complement)</span><br>'
-    + '= p &nbsp; <span class="muted">(identity)</span>'
+    + '<div class="example"><div class="label">Worked factoring</div>'
+    + '(p ∧ q) ∨ (p ∧ r)<br>'
+    + '= p ∧ (q ∨ r) &nbsp; <span class="muted">(distributive law in reverse)</span><br>'
+    + 'Factoring exposes the shared requirement p and removes a duplicated test.'
     + '</div>'
 
     + '<div class="callout"><div class="label">Why this matters</div>'
     + 'Every digital circuit is a Boolean expression. Minimizing the expression = fewer gates = cheaper, faster hardware. The same simplifications also let you spot redundant logic in code.'
-    + '</div>'
-
-    + '<h4>Putting it all together</h4>'
-    + '<p>You\'ve walked through the whole arc:</p>'
-    + '<ol>'
-    +   '<li>Logic — propositions, connectives, truth tables.</li>'
-    +   '<li>Equivalences — recognising when two expressions mean the same thing.</li>'
-    +   '<li>Predicates and quantifiers — claims about whole sets.</li>'
-    +   '<li>Sets — the basic container.</li>'
-    +   '<li>Relations and functions — how elements connect.</li>'
-    +   '<li>Induction — proving something for infinitely many cases.</li>'
-    +   '<li>Counting — how many ways.</li>'
-    +   '<li>Pigeonhole and probability — guaranteed collisions and likelihoods.</li>'
-    +   '<li>Graphs — the discrete data structure.</li>'
-    +   '<li>Trees and Boolean algebra — special graphs and the math of circuits.</li>'
-    + '</ol>'
-    + '<p>This is the spine of CSE 260. Going in, you\'ll have seen every concept once before — the class will be filling in detail and proving things rigorously, not introducing new vocabulary.</p>',
+    + '</div>',
 
   mountPlay: function (container) {
     container.innerHTML = ''
@@ -235,22 +206,22 @@ DMT.registerLevel({
   puzzles: [
     {
       difficulty: 'easy',
-      prompt: 'A graph G has 7 vertices and 6 edges, is connected, and has no cycles. What kind of graph is G?',
+      prompt: 'Simplify <code class="inline">¬¬p ∧ T</code>.',
       mountInput: function (c) {
-        var opts = ['A complete graph', 'A tree', 'A cycle', 'A bipartite graph but not a tree'];
+        var opts = ['p', '¬p', 'T', 'F'];
         var sel = document.createElement('select');
         sel.innerHTML = '<option value="-1">— pick one —</option>' + opts.map(function (o, i) { return '<option value="' + i + '">' + o + '</option>'; }).join('');
         c.appendChild(sel);
         return function () { return parseInt(sel.value, 10); };
       },
       check: function (v) {
-        if (v === 1) return { correct: true, feedback: 'Connected + acyclic = tree. The edge count fits the rule |E| = |V| − 1 (6 = 7 − 1).' };
-        return { correct: false, feedback: 'Definition of a tree: connected and acyclic. Plus the edge count matches |V|−1: 7 vertices, 6 edges.' };
+        if (v === 0) return { correct: true, feedback: 'Double negation gives p, then identity gives p ∧ T = p.' };
+        return { correct: false, feedback: 'Apply double negation first: ¬¬p = p. Then p ∧ T = p.' };
       },
       hints: [
-        'Definition: tree = connected + acyclic.',
-        'Also: |E| = |V| − 1 is a hallmark of trees. Here 6 = 7 − 1 ✓.',
-        'It\'s a tree.'
+        'Two negations cancel.',
+        'The expression becomes p ∧ T.',
+        'Identity law: p ∧ T = p.'
       ]
     },
     {
@@ -268,8 +239,9 @@ DMT.registerLevel({
         var clean = v.trim();
         if (!clean) return { correct: false, feedback: 'Type something first.' };
         try {
+          var normalized = DMT.lib.expr.format(DMT.lib.expr.parse(clean));
           if (DMT.lib.expr.equivalent(clean, 'p ∨ (p ∧ q)') && DMT.lib.expr.equivalent(clean, 'p')) {
-            if (clean === 'p' || clean === '(p)') return { correct: true, feedback: 'Absorption law: p ∨ (p ∧ q) = p. The "p ∧ q" can\'t make the whole thing true unless p is already true, so p alone covers it.' };
+            if (normalized === 'p') return { correct: true, feedback: 'Absorption law: p ∨ (p ∧ q) = p. The "p ∧ q" can\'t make the whole thing true unless p is already true, so p alone covers it.' };
             return { correct: false, feedback: 'Equivalent, but not the simplest form. Try just a single variable.' };
           }
           return { correct: false, feedback: 'Not equivalent to p ∨ (p ∧ q). Build a truth table to compare.' };
@@ -296,8 +268,9 @@ DMT.registerLevel({
         var clean = v.trim();
         if (!clean) return { correct: false, feedback: 'Type something first.' };
         try {
+          var normalized = DMT.lib.expr.format(DMT.lib.expr.parse(clean));
           if (DMT.lib.expr.equivalent(clean, '(p ∧ q) ∨ (p ∧ ¬q)')) {
-            if (clean === 'p' || clean === '(p)') return { correct: true, feedback: 'Factor out p: p ∧ (q ∨ ¬q) = p ∧ T = p.' };
+            if (normalized === 'p') return { correct: true, feedback: 'Factor out p: p ∧ (q ∨ ¬q) = p ∧ T = p.' };
             return { correct: false, feedback: 'Equivalent, but not simplest. Factor p out and use complement.' };
           }
           return { correct: false, feedback: 'Not equivalent. Walk through with a truth table.' };

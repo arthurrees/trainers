@@ -223,6 +223,11 @@ DMT.lib.expr = (function () {
     return s;
   }
 
+  function usesOnlyVars(ast, allowed) {
+    var vars = collectVars(ast);
+    return vars.every(function (v) { return allowed.indexOf(v) !== -1; });
+  }
+
   function renderTruthTable(input, options) {
     options = options || {};
     var tt = truthTable(input);
@@ -251,6 +256,7 @@ DMT.lib.expr = (function () {
     truthTable: truthTable,
     equivalent: equivalent,
     valueColumn: valueColumn,
+    usesOnlyVars: usesOnlyVars,
     renderTruthTable: renderTruthTable
   };
 })();

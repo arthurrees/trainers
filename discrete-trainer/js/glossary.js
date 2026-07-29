@@ -16,6 +16,12 @@ DMT.glossary = {
   '∃':  { name: 'exists',      def: '∃x P(x) means "there is at least one x where P(x) is true".' },
   '∴':  { name: 'therefore',   def: 'Used at the end of a proof to introduce the conclusion.' },
 
+  // Probability
+  'Ω':  { name: 'sample space', def: 'The set of every possible outcome of a random experiment.' },
+  'P(A)': { name: 'probability', def: 'The probability that event A occurs.' },
+  'P(B|A)': { name: 'conditional probability', def: 'The probability of B given that A has already occurred.' },
+  '⌈x⌉': { name: 'ceiling', def: 'Round x up to the nearest integer.' },
+
   // Sets
   '∈':  { name: 'is in',        def: 'x ∈ A means "x is an element of set A".' },
   '∉':  { name: 'not in',       def: 'x ∉ A means "x is not in set A".' },
@@ -39,6 +45,13 @@ DMT.glossary = {
   'reflexive':  { name: 'reflexive',  def: 'Every element is related to itself: ∀x, x R x.' },
   'symmetric':  { name: 'symmetric',  def: 'If x R y then y R x.' },
   'transitive': { name: 'transitive', def: 'If x R y and y R z then x R z.' },
+
+  // Formal languages and machines
+  'ε': { name: 'empty string', def: 'A string containing zero symbols.' },
+  '⇒': { name: 'derives', def: 'One grammar-production step transforms the left string into the right string.' },
+  'DFA': { name: 'deterministic finite automaton', def: 'A finite-state machine with exactly one next state for each state and input symbol.' },
+  'alphabet': { name: 'alphabet', def: 'The finite set of symbols a machine or language uses as input.' },
+  'accepting state': { name: 'accepting state', def: 'A state in which the machine accepts after all input has been read.' },
 
   // Combinatorics
   'n!':  { name: 'factorial',   def: 'n! = n × (n-1) × ... × 1. (0! = 1.)' },

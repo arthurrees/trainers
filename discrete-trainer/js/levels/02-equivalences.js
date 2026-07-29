@@ -1,8 +1,8 @@
 // Level 2 — Logical Equivalences
 DMT.registerLevel({
   id: 2,
-  title: 'Logical Equivalences',
-  whyItMatters: 'Two expressions can look totally different but mean the exact same thing. Recognising this lets you simplify code, prove correctness, and spot when a tangled if-statement could be one line.',
+  title: 'Equivalences & Inference',
+  whyItMatters: 'Equivalent expressions let you simplify logic; valid inference tells you which conclusions actually follow. Together they are the engine behind proofs and correctness arguments.',
   glossary: ['≡', '∧', '∨', '¬', '→', '↔', 'T', 'F'],
   learn: ''
     + '<h4>"Equivalent" means same truth table</h4>'
@@ -42,7 +42,10 @@ DMT.registerLevel({
     + '¬(¬p ∨ q) <br>'
     + '≡ ¬¬p ∧ ¬q  &nbsp; <span class="muted">(De Morgan)</span><br>'
     + '≡ p ∧ ¬q &nbsp; <span class="muted">(double negation)</span>'
-    + '</div>',
+    + '</div>'
+    + '<h4>From equivalence to valid inference</h4>'
+    + '<p>An argument is <strong>valid</strong> when no truth-table row makes every premise true and the conclusion false. For example, <code class="inline">p → q</code> and <code class="inline">p</code> force <code class="inline">q</code>. This rule is called <strong>modus ponens</strong>.</p>'
+    + '<p>Truth tables provide a mechanical validity test; the next levels turn these patterns into proof techniques.</p>',
 
   mountPlay: function (container) {
     container.innerHTML = ''
@@ -167,47 +170,22 @@ DMT.registerLevel({
     },
     {
       difficulty: 'hard',
-      prompt: 'Rewrite <code class="inline">p → q</code> using ONLY <code class="inline">¬</code>, <code class="inline">∧</code>, and <code class="inline">∨</code> — no arrow allowed. Type your expression below; the checker will verify equivalence.',
+      prompt: 'Premises: <code class="inline">p → q</code>, <code class="inline">q → r</code>, and <code class="inline">¬r</code>. Which conclusion must follow?',
       mountInput: function (c) {
-        var div = document.createElement('div');
-        div.innerHTML = '<input type="text" placeholder="must use only ¬, ∧, ∨" style="width:100%;font-size:15px">';
-        var input = div.querySelector('input');
-        var live = document.createElement('div');
-        live.style.marginTop = '8px';
-        live.style.fontFamily = 'var(--mono)';
-        live.style.fontSize = '13px';
-        function update() {
-          if (!input.value.trim()) { live.innerHTML = '<span class="muted">target: same truth table as p → q (T T F T)</span>'; return; }
-          if (/[→↔]|->|<->|<=>|=>|implies|iff/i.test(input.value)) {
-            live.innerHTML = '<span style="color:var(--bad)">→ and ↔ are not allowed in this puzzle.</span>';
-            return;
-          }
-          try {
-            var col = DMT.lib.expr.valueColumn(DMT.lib.expr.parse(input.value), ['p', 'q']);
-            var match = col === 'TTFT';
-            live.innerHTML = '<span class="muted">your column:</span> <span style="color:' + (match ? 'var(--good)' : 'var(--accent)') + '">' + col.split('').join(' ') + '</span> &nbsp; <span class="muted">target:</span> <span style="color:var(--good)">T T F T</span>';
-          } catch (e) { live.innerHTML = '<span style="color:var(--bad)">' + DMT.escapeHtml(e.message) + '</span>'; }
-        }
-        input.addEventListener('input', update);
-        update();
-        div.appendChild(live);
-        c.appendChild(div);
-        return function () { return input.value; };
+        var opts = ['p', 'q', '¬p', 'r'];
+        var sel = document.createElement('select');
+        sel.innerHTML = '<option value="-1">— pick one —</option>' + opts.map(function (o, i) { return '<option value="' + i + '">' + o + '</option>'; }).join('');
+        c.appendChild(sel);
+        return function () { return parseInt(sel.value, 10); };
       },
       check: function (v) {
-        if (/[→↔]|->|<->|<=>|=>|implies|iff/i.test(v)) {
-          return { correct: false, feedback: 'You used → or ↔ — try again with only ¬, ∧, ∨.' };
-        }
-        try {
-          var col = DMT.lib.expr.valueColumn(DMT.lib.expr.parse(v), ['p', 'q']);
-          if (col === 'TTFT') return { correct: true, feedback: 'p → q ≡ ¬p ∨ q. (Material implication — one of the most important equivalences.)' };
-          return { correct: false, feedback: 'Your column was ' + col.split('').join(' ') + '; target T T F T.' };
-        } catch (e) { return { correct: false, feedback: 'Could not parse: ' + e.message }; }
+        if (v === 2) return { correct: true, feedback: 'From q → r and ¬r, modus tollens gives ¬q. Then p → q and ¬q give ¬p.' };
+        return { correct: false, feedback: 'Work backward from ¬r: q → r forces ¬q, and then p → q forces ¬p.' };
       },
       hints: [
-        'p → q is false only when p is T and q is F. So it equals... when?',
-        'It equals: "p is false, OR q is true".',
-        'Answer: ¬p ∨ q'
+        'Start with the negative fact ¬r and the premise q → r.',
+        'Modus tollens gives ¬q. Now combine ¬q with p → q.',
+        'A second use of modus tollens gives ¬p.'
       ]
     }
   ]

@@ -16,7 +16,7 @@ No install, no build. Open any trainer's `index.html` in a browser (works over `
 
 | Folder | Subject | Levels |
 |---|---|---|
-| `discrete-trainer/` | Discrete math (CSE 260 prep): propositional logic → graphs → boolean algebra | 11 |
+| `discrete-trainer/` | Discrete math (CSE 260 prep): logic → proofs → sets → counting → probability → grammars → finite-state machines | 15 |
 | `networking-trainer/` | Networking: IPv4 → subnetting → layers → ARP → routing → TCP/UDP → DNS → HTTP → TLS → NAT | 13 |
 | `ai-trainer/` | AI / ML / deep learning: math foundations → classical ML → neural nets (backprop by hand) → architectures → modern LLMs | 21 |
 | `hardware-trainer/` | PC hardware, builder's-eye view: CPU → memory → PCIe → storage → GPU → PSU → cooling → bottlenecks | 14 |
@@ -28,7 +28,9 @@ No install, no build. Open any trainer's `index.html` in a browser (works over `
 | `git-trainer/` | Git internals: object model → three trees → refs → DAG → merge → rebase → reflog → bisect | 14 |
 | `regex-trainer/` | Regex on the live JS engine: classes → quantifiers → greedy/lazy → anchors → groups → backrefs → lookaround → ReDoS | 14 |
 
-`binary-trainer/` is an early stub, not yet complete.
+`binary-trainer/` (binary and bit manipulation) is a working trainer as well, but built on an older
+single-file structure (`index.html` + `game.js`) rather than the shared shell the others use, so it's
+noted here separately from the table.
 
 ## Architecture
 

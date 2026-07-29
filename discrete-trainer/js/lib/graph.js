@@ -129,18 +129,7 @@ DMT.lib.graph = (function () {
   }
 
   function isEulerian(g) {
-    if (g.nodes.length === 0) return true;
-    var nonIso = g.nodes.filter(function (n) { return degree(g, n.id) > 0; });
-    if (nonIso.length === 0) return true;
-    var visited = {};
-    var stack = [nonIso[0].id];
-    while (stack.length) {
-      var v = stack.pop();
-      if (visited[v]) continue;
-      visited[v] = true;
-      neighbors(g, v).forEach(function (n) { if (!visited[n]) stack.push(n); });
-    }
-    if (!nonIso.every(function (n) { return visited[n.id]; })) return false;
+    if (g.nodes.length === 0 || !isConnected(g)) return false;
     return g.nodes.every(function (n) { return degree(g, n.id) % 2 === 0; });
   }
 

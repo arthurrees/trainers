@@ -1,6 +1,6 @@
-// Level 5 — Relations & Functions
+// Level 6 — Relations & Functions
 DMT.registerLevel({
-  id: 5,
+  id: 6,
   title: 'Relations & Functions',
   whyItMatters: 'A relation is just "which pairs of things are connected" — friendships, divisibility, edges in a graph, parent-of in a family tree, equality. Functions are a special tidy kind of relation. Once you see this layer, half the data structures in CS look obvious.',
   glossary: ['reflexive', 'symmetric', 'transitive', 'f: A→B', 'injective', 'surjective', 'bijective'],
@@ -83,7 +83,7 @@ DMT.registerLevel({
         html += '<tr><th style="padding:6px 12px;color:var(--accent)">' + (r + 1) + '</th>';
         for (var c2 = 0; c2 < n; c2++) {
           var on = pairs[r][c2];
-          html += '<td data-r="' + r + '" data-c="' + c2 + '" style="border:1px solid var(--border);width:38px;height:38px;text-align:center;cursor:pointer;background:' + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? '#0b0d12' : 'var(--text-dim)') + '">' + (on ? '✓' : '') + '</td>';
+          html += '<td data-r="' + r + '" data-c="' + c2 + '" tabindex="0" role="button" aria-label="Toggle pair (' + (r + 1) + ',' + (c2 + 1) + ')" style="border:1px solid var(--border);width:38px;height:38px;text-align:center;cursor:pointer;background:' + (on ? 'var(--accent)' : 'transparent') + ';color:' + (on ? '#0b0d12' : 'var(--text-dim)') + '">' + (on ? '✓' : '') + '</td>';
         }
         html += '</tr>';
       }
@@ -95,6 +95,9 @@ DMT.registerLevel({
           var c = parseInt(td.getAttribute('data-c'), 10);
           pairs[r][c] = !pairs[r][c];
           render();
+        });
+        td.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); td.click(); }
         });
       });
       var p = checkProps();
@@ -195,11 +198,19 @@ DMT.registerLevel({
         return function () { return input.value; };
       },
       check: function (v) {
+        if (!/^\s*\(\s*[123]\s*,\s*[123]\s*\)\s*(,\s*\(\s*[123]\s*,\s*[123]\s*\)\s*)*$/.test(v)) {
+          return { correct: false, feedback: 'Use only comma-separated pairs from {1,2,3}, formatted like (1,2), (2,1).' };
+        }
         var pairs = [];
         var re = /\(\s*([123])\s*,\s*([123])\s*\)/g;
         var m;
         while ((m = re.exec(v))) pairs.push([parseInt(m[1], 10), parseInt(m[2], 10)]);
-        if (pairs.length === 0) return { correct: false, feedback: 'I couldn\'t find any pairs in your input. Format them like (1,2).' };
+        var pairKeys = {};
+        for (var p = 0; p < pairs.length; p++) {
+          var key = pairs[p][0] + ',' + pairs[p][1];
+          if (pairKeys[key]) return { correct: false, feedback: 'A relation is a set of pairs; remove the duplicate (' + key + ').' };
+          pairKeys[key] = true;
+        }
         function has(a, b) { return pairs.some(function (p) { return p[0] === a && p[1] === b; }); }
         for (var i = 1; i <= 3; i++) if (!has(i, i)) return { correct: false, feedback: 'Not reflexive — missing (' + i + ',' + i + ').' };
         for (var i = 1; i <= 3; i++) for (var j = 1; j <= 3; j++) if (has(i, j) && !has(j, i)) return { correct: false, feedback: 'Not symmetric — has (' + i + ',' + j + ') but missing (' + j + ',' + i + ').' };

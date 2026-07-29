@@ -1,6 +1,6 @@
-// Level 6 — Proof by Induction
+// Level 7 — Proof by Induction
 DMT.registerLevel({
-  id: 6,
+  id: 7,
   title: 'Proof by Induction',
   whyItMatters: 'Loops, recursion, and any algorithm that builds up a result one step at a time are proven correct by induction. It\'s the same idea as a recursive function: handle the base case, then trust the recursive call.',
   glossary: ['induction', 'base case', 'inductive step', '∀'],

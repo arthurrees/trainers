@@ -14,6 +14,7 @@ DMT.hints = {
     btn.textContent = 'Hint (' + hints.length + ' available)';
     var box = document.createElement('div');
     box.style.marginTop = '8px';
+    box.setAttribute('aria-live', 'polite');
 
     btn.addEventListener('click', function () {
       if (revealed >= hints.length) return;
